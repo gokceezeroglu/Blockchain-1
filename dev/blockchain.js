@@ -3,8 +3,11 @@ const sha256 = require('sha256');
 function Blockchain() {
   this.chain = []; //to store all blocks
   this.PendingTransactions = []; //to store new transactions
+  //gensis block or head block
+  this.createNewBlock(100, '0', '0');
 }
 
+//new block
 Blockchain.prototype.createNewBlock = function (
   nonce,
   previousBlockHash,
@@ -24,10 +27,12 @@ Blockchain.prototype.createNewBlock = function (
   return newBlock;
 };
 
+//get last block
 Blockchain.prototype.getLastBlock = function () {
   return this.chain[this.chain.length - 1];
 };
 
+//new transaction
 Blockchain.prototype.createNewTransaction = function (
   amount,
   sender,
@@ -42,6 +47,7 @@ Blockchain.prototype.createNewTransaction = function (
   return this.getLastBlock()['index'] + 1;
 };
 
+//hash/encrypt block
 Blockchain.prototype.hashBlock = function (
   previousBlockHash,
   currentBlockData,
@@ -53,6 +59,27 @@ Blockchain.prototype.hashBlock = function (
   //hash the string
   const hash = sha256(dataAsString);
   return hash;
+};
+
+//proof of work
+//repedatedly hash block until it finds correct hash=>hash start with specific numbers
+//use current block data for hash but also previousBlock hash so one if one want to chan ge one block than all  blocks need to be chanhged
+//to find correct hash it continously change value of nonce
+//return us the nonce value that creates the required hash
+Blockchain.prototype.proofOfWork = function (
+  previousBlockHash,
+  currentBlockData
+) {
+  let nonce = 0;
+  let hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+
+  while (hash.substring(0, 4) !== '0000') {
+    //run until hash starting with four 0's
+    nonce++;
+    hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+  }
+  console.log(hash);
+  return nonce;
 };
 
 module.exports = Blockchain;

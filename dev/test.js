@@ -2,6 +2,8 @@ const Blockchain = require('./blockchain');
 
 const bitcoin = new Blockchain(); //object of blockchain to acces it
 
+console.log(bitcoin);
+
 /*//creating new block
 bitcoin.createNewBlock(23389, 'ON162HHGHG12334', 'WEON1224435GFD');
 
@@ -17,7 +19,7 @@ bitcoin.createNewTransaction(300, 'ALEXHGDSJHDJHSGJD', 'JENGVSGDFGDG');
 bitcoin.createNewBlock(3334444, 'BAWAWAWAWAWAWXHXH', 'XXXXXXMXMDDDFF');*/
 
 //create hash
-const previousBlockHash = 'OJDNCHDHDJJKDDKJ';
+/*const previousBlockHash = 'OJDNCHDHDJJKDDKJ';
 const currentBlockData = [
   //array of transction in this block
   {
@@ -36,8 +38,8 @@ const currentBlockData = [
     recipient: 'RAIS87687HJDJHGDJDJH',
   },
 ];
-const nonce = 1919;
-
-const p = bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce);
-
-console.log(p);
+console.log(bitcoin.hashBlock(previousBlockHash, currentBlockData, 73288));*/
+//creating proof of work
+/*console.log(
+  bitcoin.proofOfWork(previousBlockHash, currentBlockData, currentBlockData)
+);*/
