@@ -208,6 +208,54 @@ app.post('/register-nodes-bulk', function (req, res) {
   res.json({ note: 'Bulk regestration successfull.' });
 });
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//to validate/check the blocks and chain
+//finding the longest chain of block
+app.get('/consensus', function (req, res) {
+  const requestPromises = [];
+  bitcoin.networkNodes.forEach((networkNodeUrl) => {
+    const requestOptions = {
+      uri: networkNodeUrl + '/blockchain',
+      method: 'GET',
+      json: true,
+    };
+    requestPromises.push(rp(requestOptions));
+  });
+
+  Promise.all(requestPromises).then((blockchains) => {
+    const currentChainlength = bitcoin.chain.length;
+    let maxChainLength = currentChainlength;
+    let newLongestChain = null;
+    let newPendingTransactions = null;
+
+    blockchains.forEach((blockchain) => {
+      if (blockchain.chain.length > maxChainLength) {
+        maxChainLength = blockchain.chain.length;
+        newLongestChain = blockchain.chain;
+        newPendingTransactions = blockchain.PendingTransactions;
+      }
+    });
+    if (
+      !newLongestChain ||
+      (newLongestChain && !bitcoin.chainIsValid(newLongestChain))
+    ) {
+      res.json({
+        note: 'Current chain has not been replaced',
+        chain: bitcoin.chain,
+      });
+    } else {
+      //replace current chain ith longest chain in network
+      bitcoin.chain = newLongestChain;
+      bitcoin.PendingTransactions = newPendingTransactions;
+      res.json({
+        note: 'This chain has been replaced',
+        chain: bitcoin.chain,
+      });
+    }
+  });
+});
+
 app.listen(port, function () {
   console.log(`Server on Port ${port}`);
 });

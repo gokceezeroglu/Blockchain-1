@@ -94,4 +94,43 @@ Blockchain.prototype.proofOfWork = function (
   return nonce;
 };
 
+//validate chain to check whether the chain is legitimate/valid or not
+//by iterate all of the blocks and make sure all of the blocks are lineup correctly
+Blockchain.prototype.chainIsValid = function (blockchain) {
+  let validChain = true;
+
+  for (var i = 1; i < blockchain.length; i++) {
+    const currentBlock = blockchain[i];
+    const prevBlock = blockchain[i - 1];
+    const blockHash = this.hashBlock(
+      prevBlock['hash'],
+      {
+        transactions: currentBlock['transactions'],
+        index: currentBlock['index'],
+      },
+      currentBlock['nonce']
+    );
+    //to validate block data by checking it ends with 4'0 or not
+    if (blockHash.substring(0, 4) !== '0000') validChain = false;
+    //to validate block by hash
+    if (currentBlock['previousBlockHash'] !== prevBlock['hash'])
+      validChain = false;
+  }
+  //check root/head/gensis block
+  const gensisBlock = blockchain[0];
+  const correctNonce = gensisBlock['nonce'] === 100;
+  const correctPreviousBlockHash = gensisBlock['previousBlockHash'] === '0';
+  const correctHash = gensisBlock['hash'] === '0';
+  const correctTransactions = gensisBlock['transactions'].length === 0;
+  if (
+    !correctNonce ||
+    !correctPreviousBlockHash ||
+    !correctHash ||
+    !correctTransactions
+  )
+    validChain = false;
+
+  return validChain;
+};
+
 module.exports = Blockchain;
