@@ -210,7 +210,8 @@ app.post('/register-nodes-bulk', function (req, res) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//to validate/check the blocks and chain
+//to validate/check the blocks and chain as if new block is broadcast it needs
+//to add all previous transaction when this block is not created
 //finding the longest chain of block
 app.get('/consensus', function (req, res) {
   const requestPromises = [];
@@ -254,6 +255,40 @@ app.get('/consensus', function (req, res) {
       });
     }
   });
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//use to get the corresponding block using  blockHash
+app.get('/block/:blockHash', function (req, res) {
+  const blockHash = req.params.blockHash;
+  const correctBlock = bitcoin.getBlock(blockHash);
+  res.json({ block: correctBlock });
+});
+
+//use to get corresponding transaction & block using transactionId
+app.get('/transaction/:transactionId', function (req, res) {
+  const transactionId = req.params.transactionId;
+  const transactionData = bitcoin.getTransaction(transactionId);
+  res.json({
+    transaction: transactionData.transaction,
+    block: transactionData.block,
+  });
+});
+
+//get net balance and all transactions of a user corresponds to an adress
+app.get('/address/:address', function (req, res) {
+  const address = req.params.address;
+  const addressData = bitcoin.getAddressData(address);
+  res.json({
+    addressData: addressData,
+  });
+});
+
+//add html file
+app.get('/block-explorer', function (req, res) {
+  res.sendFile('./block-explorer/index.html', { root: __dirname });
 });
 
 app.listen(port, function () {
